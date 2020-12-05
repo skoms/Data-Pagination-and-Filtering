@@ -16,7 +16,6 @@ in the conditional statement, and using template literals to weave in values fro
 in the list. Finally using '.insertAdjacentHTML' on studentList and placing the 'html'
 (which is where the template literals for the students are stored) before the end.
 */
-
 const showPage = ( list, page ) => {
    const startIndex = ( page * 9 ) - 9;
    const endIndex = page * 9;
@@ -60,7 +59,7 @@ const addPagination = list => {
       `);
    }
    // Here we initiate the first button to be active, as the page initiates at page 1
-   document.querySelector( 'button' ).className = 'active';
+   document.querySelector( 'ul button' ).className = 'active';
 
    /* 
    Here we add an Event Listener to the UL with class name link-list to detect whether one
@@ -85,7 +84,34 @@ const addPagination = list => {
 }
 
 
+/* 
+ NEEDS WORK, DOESNT FUNCTION PROPERLY YET
+*/
+const addSearchField = list => {
+   const header = document.querySelector( '.header' );
+   header.insertAdjacentHTML( 'beforeend', `
+      <label for="search" class="student-search">
+         <input id="search" placeholder="Search by name...">
+         <button type="button"><img src="img/icn-search.svg" alt="Search icon"></button>
+      </label> 
+   `);
+   const label = document.querySelector( '.student-search' );
+   const input = document.getElementById( 'search' );
+   label.addEventListener('keyup', e => {
+      let filtered = [];
+      for (let i = 0; i < list.length; i++) {
+         const fullName= `${list[i].name.title} ${list[i].name.first} ${list[i].name.last} `;
+         if ( fullName.includes(input.textContent) ) {
+            filtered.push(list[i]);
+         }
+      }
+      console.log(filtered);
+      showPage(filtered, 1);
+   });
+}
+
 // Calling the functions to initiate the first page,
 // as well as adding the pagination buttons
 showPage( data, 1 );
 addPagination( data );
+addSearchField( data );
