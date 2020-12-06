@@ -4,23 +4,16 @@ FSJS Project 2 - Data Pagination and Filtering
 */
 
 /*
-The `showPage` function:
-This function takes in 2 arguments, the list and the pagenumber of the page you want to show,
-first we declare 3 functions: startIndex, to indicate where in the list we want to start getting
-students using some simple calculation based on the desired number of students per page,
-here its 9, endIndex, which similarily as the one above, but is for showing where we wish to end
-not including list[endIndex], and studentList, that selects UL element with class 'student-list'
-from the DOM. We set the innerHTML of the studentList to an empty string to clean up and 
-residue from last instance. Then we loop over and create all the list items that pass the range check
-in the conditional statement, and using template literals to weave in values from the object keys
-in the list. Finally using '.insertAdjacentHTML' on studentList and placing the 'html'
-(which is where the template literals for the students are stored) before the end.
+`showPage` function:
+Calculates the indexes for start and end and creates those elements to show it on the page.
+
 */
 const showPage = ( list, page ) => {
-   const startIndex = ( page * 9 ) - 9;
-   const endIndex = page * 9;
-   const studentList = document.querySelector( 'ul.student-list' );
-   studentList.innerHTML = '';
+   const startIndex = ( page * 9 ) - 9; // Calculates from where to start creating the elements according to page
+   const endIndex = page * 9; // Calculates where to end according to pagenumber
+   const studentList = document.querySelector( 'ul.student-list' ); // Stores the ul elements we need to display the elements into a variable
+   studentList.innerHTML = ''; // Clears the HTML of the UL
+   // Iterates over the elements within the range and creates the elements that fit
    for ( let i = 0; i < list.length; i++ ) {
       if ( list.indexOf( list[ i ] ) >= startIndex && list.indexOf( list[ i ] ) < endIndex  ) {
          let html = `
@@ -42,8 +35,8 @@ const showPage = ( list, page ) => {
 
 
 /*
-The `addPagination` function:
-This function calculates the required number of pagination buttons, using the return
+`addPagination` function:
+Calculates the required number of pagination buttons, using the return
 to loop that many times to make the required amount of buttons, and adding them within the 
 loop using '.inserAdjacentHTML'.
 */
@@ -58,40 +51,29 @@ const addPagination = list => {
          </li>
       `);
    }
-   // Here we initiate the first button to be active if there are at least one element
+   // initiates the first button to be active if there are at least one element
    // to be shown, as the page should only initiate at page 1 if there are items to show.
    if( list.length > 0) {
       document.querySelector( 'ul button' ).className = 'active';
    }
    /* 
-   Here we add an Event Listener to the UL with class name link-list to detect whether one
-   of the buttons have been clicked, this is achieved by checking the event target type and 
-   making sure it is a button. Then we select all the buttons, remove any 'active' class, 
-   that might have been left over from the left button press, and adding the class 'active'
-   to the new active button (the one that triggered the event). Finally we show the new page
-   using 'showPage' with the arguments list(from the parameter) and the button textcontent,
-   which is also the number of the page we want.
+   Event Listener to detect a button has been clicked.  
    */
    linkList.addEventListener( 'click', e => {
       if ( e.target.type === 'button' ) {
-         const buttons = document.querySelectorAll( 'ul.link-list button' );
+         const buttons = document.querySelectorAll( 'ul.link-list button' ); // Selects all the buttons
          for ( let i = 0; i < buttons.length; i++ ) {
             const button = buttons[ i ];
-            button.classList.remove( 'active' );
+            button.classList.remove( 'active' ); // remove any 'active' class that might have been left over
          }
-         e.target.classList.add( 'active' );
-         showPage( list, e.target.textContent );
+         e.target.classList.add( 'active' ); // adding the class 'active' to the new active button (the one that triggered the event).
+         showPage( list, e.target.textContent ); // Calls'showPage' with the arguments list and the button textContent(which is the pagenumber)
       }
    });
 }
 
 
-/* 
- The 'addSearchField' function creates the search form and appends it to 
- the header element before the end using '.inserAdjacentHTML' and the 
- argument 'beforeend'. It also puts two event listeners to the form, for more
- info look below.
-*/
+// 'addSearchField' creates the search form and appends it to '.header' before the end . It also puts two event listeners to the form
 const addSearchField = list => {
    const header = document.querySelector( '.header' );
    header.insertAdjacentHTML( 'beforeend', `
@@ -100,21 +82,16 @@ const addSearchField = list => {
          <button type="button"><img src="img/icn-search.svg" alt="Search icon"></button>
       </label> 
    `);
-   // Initiating the label and input variables to easily access the values inside the 
-   // event listeners
+   // Initiates label and input variables to access the values inside the event listeners
    const label = document.querySelector( '.student-search' );
    const input = document.getElementById( 'search' );
-   /*
-      'UpdatePage' is as the name suggests a function to update the page, 
-      this function checks whether there are any items to show, if there are no matching
-      results, it should just display 'No results found.' on the page. Also making
-      it not display any pagination buttons as there aren't actually any pages of 
-      results
-   */
+   // 'UpdatePage' is a function to update the page
    const updatePage = ( list ) => {
+      // it checks whether there are any items to show
       if ( list.length === 0 ) {
+         // if there are no matching results, it displays 'No results found.' 
          showPage( list, 1 );
-         addPagination( list );
+         addPagination( list ); // Also making it not display any pagination buttons since there are no results
          document.querySelector( 'ul.student-list' ).innerHTML = `<p>No results found.</p>`;
       } else {
          document.querySelector( 'ul.student-list' ).innerHTML = ``;
@@ -122,13 +99,9 @@ const addSearchField = list => {
          addPagination( list );
       }
    }
-   /* 
-      This add an eventlistener to when someone presses the form, be that the field itself,
-      or the searchbutton. Creates a filtered version of the students array using '.filter',
-      and then passes in said new array into the showPage and addPagination to display
-      the page correctly according to the new list.
-   */
-   label.addEventListener( 'click', e => {
+   // Adds an eventlistener for clicks on the form. 
+   label.addEventListener( 'click', () => {
+      // Creates a filtered version of the students array
       const filteredList = list.filter( student => {
          const fullName = `${ student.name.title } ${ student.name.first } ${ student.name.last }`.toLowerCase();
          if( fullName.includes( input.value.toLowerCase() ) ) {
@@ -138,18 +111,11 @@ const addSearchField = list => {
          }
       });
 
-      updatePage( filteredList );
+      updatePage( filteredList ); // passes in filteredList to update the page (display and pagination buttons)
    });
-   /* 
-      This add an eventlistener to when someone is typing in the input search field. 
-      The event listener is triggered every time a key comes up again, doing it so that
-      the list refreshes as we are still typing, this has a few benefits, mainly that
-      the user wont always need to write the whole name before he/she finds the person 
-      they are looking for. then it creates a filtered version of the students array using '.filter',
-      and then passes in said new array into the showPage and addPagination to display
-      the page correctly according to the new list.
-   */
-   label.addEventListener('keyup', e => {
+   // This adds an eventlistener that triggers when input is endered and refreshes as you're typing. 
+   label.addEventListener('keyup', () => {
+      // creates a filtered version of the students array
       const filteredList = list.filter( student => {
          const fullName = `${ student.name.title } ${ student.name.first } ${ student.name.last }`.toLowerCase();
          if( fullName.includes( input.value.toLowerCase() ) ) {
@@ -159,13 +125,11 @@ const addSearchField = list => {
          }
       });
       
-      updatePage( filteredList );
+      updatePage( filteredList ); // passes in filteredList to update the page (display and pagination buttons)
    });
 }
 
-// A small little function just to initiate the firstpage in the correct order, instead
-// of calling 3 functions, also more descriptive in what it does, compared to decypher 
-// three of them
+// A function to initiate the first page
 const initiatePage = ( list ) => {
    showPage( list, 1 );
    addPagination( list );
