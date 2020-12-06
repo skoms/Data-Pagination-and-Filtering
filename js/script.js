@@ -115,7 +115,7 @@ const addSearchField = list => {
       if ( list.length === 0 ) {
          showPage( list, 1 );
          addPagination( list );
-         document.querySelector( 'ul.student-list' ).innerHTML = `<h2>No results found.</h2>`;
+         document.querySelector( 'ul.student-list' ).innerHTML = `<p>No results found.</p>`;
       } else {
          document.querySelector( 'ul.student-list' ).innerHTML = ``;
          showPage( list, 1 );
